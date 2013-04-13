@@ -1,0 +1,3 @@
+[submodule "sites/all/modules/pathauto_for_rdf"]
+	path = sites/all/modules/pathauto_for_rdf
+	url = shah@git.drupal.org:sandbox/shah/1871288.git
