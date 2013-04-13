@@ -461,10 +461,11 @@ div.admin-panel h3 {
 	margin: 0;
 	padding: 0;
 }
-#site-name a, #site-name a:hover {
+p#site-name a, p#site-name a:hover,
+h1#site-name a, h1#site-name a:hover {
 	font-weight: bold;
 	text-decoration: none;
-	font-size: 36px;
+	font-size: 32px;
 	line-height: normal;
 }
 #site-slogan {
@@ -1090,24 +1091,14 @@ div.toboggan-login-link-container {
 	padding-left: 20px; /* LTR */
 }
 
+/* HEADER IMAGE ROTATOR */
+.himg #headimg {
+	background: #fff url(../_custom/headerimg/rotate.php) no-repeat 100% 100%; /* rotates images in the headerimg folder */
+	border-bottom: 1px solid #eee;
+}
+
 /* MODULE SPECIFIC STYLES */
 
-.book-navigation {
-	padding-top: 20px;
-	clear: both;
-}
-.book-navigation a {
-	text-decoration: none !important;
-}
-.book-navigation a:hover {
-	text-decoration: underline !important;
-}
-.book-navigation .menu {
-	border-top: none;
-}
-.book-navigation .page-up {
-	width: 5%;
-}
 .panel-col-top .node .content {
 	background-image: none;
 }
