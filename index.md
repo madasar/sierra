@@ -1,7 +1,7 @@
 ---
-layout:default
+layout: home
 ---
-# This is the header
+## This is the header
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellat, consectetur, magni doloribus iste enim exercitationem ad expedita nihil delectus totam ratione excepturi accusamus quod sit ea facilis rerum quidem provident.
 
