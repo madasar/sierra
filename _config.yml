@@ -1,0 +1,7 @@
+server_port:  5000
+auto: true
+layout: default
+sitename: Sierra Project
+repo: "https://github.com/seyyedshah/sierra"
+wiki: "https://github.com/seyyedshah/sierra/wiki"
+tracker: "https://github.com/seyyedshah/sierra/issues"
