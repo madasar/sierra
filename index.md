@@ -49,5 +49,5 @@ People who have contributed to the project.
 
 ## Funding
 
-This research has been supported by the Disaster 2.0 project [http://www.disaster20.eu](http://www.disaster20.eu) funded by the "Prevention, preparedness and consequence management of terrorism and other security-related risks" programme, European Commission – Directorate-Home Affairs (HOME/2010/CIPS/AG/002).
+This research has been supported by the Disaster 2.0 project [http://www.disaster20.eu](http://www.disaster20.eu) funded by the "Prevention, preparedness and consequence management of terrorism and other security-related risks" programme, European Commission \– Directorate-Home Affairs (HOME/2010/CIPS/AG/002).
 
