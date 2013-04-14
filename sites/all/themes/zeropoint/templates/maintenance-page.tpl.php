@@ -3,7 +3,7 @@
 
 <head>
 <title><?php print $head_title ?></title>
-<meta http-equiv="X-UA-Compatible" content="IE=8" />
+<meta http-equiv="X-UA-Compatible" content="edge" />
 <?php print $head ?>
 <?php print $styles ?>
 <?php print $scripts ?>
