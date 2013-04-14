@@ -82,16 +82,6 @@ $filtered_html_format = array(
       'cache' => -1,
     ),
     array(
-      'module' => 'search',
-      'delta' => 'form',
-      'theme' => $default_theme,
-      'status' => 1,
-      'weight' => -1,
-      'region' => 'sidebar_first',
-      'pages' => '',
-      'cache' => -1,
-    ),
-    array(
       'module' => 'node',
       'delta' => 'recent',
       'theme' => $admin_theme,
@@ -121,17 +111,7 @@ $filtered_html_format = array(
       'pages' => '',
       'cache' => -1,
     ),
-    array(
-      'module' => 'system',
-      'delta' => 'powered-by',
-      'theme' => $default_theme,
-      'status' => 1,
-      'weight' => 10,
-      'region' => 'footer',
-      'pages' => '',
-      'cache' => -1,
-    ),
-    array(
+   array(
       'module' => 'system',
       'delta' => 'help',
       'theme' => $default_theme,
@@ -181,16 +161,6 @@ $filtered_html_format = array(
       'pages' => '',
       'cache' => -1,
     ),
-    array(
-      'module' => 'search',
-      'delta' => 'form',
-      'theme' => $admin_theme,
-      'status' => 1,
-      'weight' => -10,
-      'region' => 'dashboard_sidebar',
-      'pages' => '',
-      'cache' => -1,
-    ),
   );
   $query = db_insert('block')->fields(array('module', 'delta', 'theme', 'status', 'weight', 'region', 'pages', 'cache'));
   foreach ($blocks as $block) {
@@ -203,23 +173,30 @@ $filtered_html_format = array(
   // documentation at: http://api.drupal.org/api/HEAD/function/hook_node_info.
   $types = array(
     array(
-      'type' => 'page',
-      'name' => st('Basic page'),
+      'type' => 'organisation',
+      'name' => st('Organisation'),
       'base' => 'node_content',
-      'description' => st("Use <em>basic pages</em> for your static content, such as an 'About us' page."),
+      'description' => st(""),
       'custom' => 1,
       'modified' => 1,
       'locked' => 0,
     ),
     array(
-      'type' => 'article',
-      'name' => st('Article'),
+      'type' => 'request',
+      'name' => st('Request'),
       'base' => 'node_content',
-      'description' => st('Use <em>articles</em> for time-sensitive content like news, press releases or blog posts.'),
-      'custom' => 1,
-      'modified' => 1,
+      'description' => st(''),
+      'has_title' => '1',
+      'title_label' => st('Request Name'),
       'locked' => 0,
-    ),
+     ),
+     array(
+	'type' => 'response',
+	'name' => st('Response'),
+	'base' => 'node_content',
+	'description' => st(''),
+	'locked' => 0,
+     )
   );
 
   foreach ($types as $type) {
@@ -228,172 +205,3254 @@ $filtered_html_format = array(
     node_add_body_field($type);
   }
 
-  // Insert default pre-defined RDF mapping into the database.
-  $rdf_mappings = array(
-    array(
-      'type' => 'node',
-      'bundle' => 'page',
-      'mapping' => array(
-        'rdftype' => array('foaf:Document'),
+  $rdf_mappings = array();
+
+  // Exported RDF mapping: organisation
+  $rdf_mappings['node']['organisation'] = array(
+    'rdftype' => array(
+      0 => 'hxl:Organisation',
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+      'type' => 'property',
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
       ),
     ),
-    array(
-      'type' => 'node',
-      'bundle' => 'article',
-      'mapping' => array(
-        'field_image' => array(
-          'predicates' => array('og:image', 'rdfs:seeAlso'),
-          'type' => 'rel',
-        ),
-        'field_tags' => array(
-          'predicates' => array('dc:subject'),
-          'type' => 'rel',
-        ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'field_location' => array(
+      'type' => 'property',
+      'predicates' => array(
+        0 => 'hxl:locatedAt',
+      ),
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+      'type' => 'property',
+    ),
+  );
+
+  // Exported RDF mapping: response
+  $rdf_mappings['node']['response'] = array(
+    'rdftype' => array(
+      0 => 'rr:Response',
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'rr:Comment',
+      ),
+      'type' => 'property',
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'rr:Name',
+      ),
+      'type' => 'property',
+    ),
+    'field_request_uri' => array(
+      'type' => 'property',
+      'predicates' => array(
+        0 => 'rr:RequestRef',
+      ),
+    ),
+    'field_status' => array(
+      'type' => 'property',
+      'predicates' => array(
+        0 => 'rr:Status',
       ),
     ),
   );
-  foreach ($rdf_mappings as $rdf_mapping) {
-    rdf_mapping_save($rdf_mapping);
-  }
 
-  // Default "Basic page" to not be promoted and have comments disabled.
-  variable_set('node_options_page', array('status'));
-  variable_set('comment_page', COMMENT_NODE_HIDDEN);
+  // Exported RDF mapping: request
+  $rdf_mappings['node']['request'] = array(
+    'rdftype' => array(
+      0 => 'rr:Request',
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'rr:Comment',
+      ),
+      'type' => 'property',
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'rr:Name',
+      ),
+      'type' => 'property',
+    ),
+    'field_date_required' => array(
+      'type' => 'property',
+      'predicates' => array(
+        0 => 'rr:StartDate',
+      ),
+    ),
+    'field_site_from' => array(
+      'type' => 'property',
+      'predicates' => array(
+        0 => 'rr:ItemSite',
+      ),
+    ),
+    'field_site_to' => array(
+      'type' => 'property',
+      'predicates' => array(
+        0 => 'rr:RequesterSite',
+      ),
+    ),
+    'field_item' => array(
+      'type' => 'property',
+      'predicates' => array(
+        0 => 'rr:Item',
+      ),
+    ),
+  );
 
-  // Don't display date and author information for "Basic page" nodes by default.
-  variable_set('node_submitted_page', FALSE);
-
-  // Enable user picture support and set the default to a square thumbnail option.
-  variable_set('user_pictures', '1');
-  variable_set('user_picture_dimensions', '1024x1024');
-  variable_set('user_picture_file_size', '800');
-  variable_set('user_picture_style', 'thumbnail');
 
   // Allow visitor account creation with administrative approval.
   variable_set('user_register', USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL);
 
-  // Create a default vocabulary named "Tags", enabled for the 'article' content type.
-  $description = st('Use tags to group articles on similar topics into categories.');
-  $help = st('Enter a comma-separated list of words to describe your content.');
-  $vocabulary = (object) array(
-    'name' => st('Tags'),
-    'description' => $description,
-    'machine_name' => 'tags',
-    'help' => $help,
-  );
-  taxonomy_vocabulary_save($vocabulary);
+  $field_bases = array();
 
-  $field = array(
-    'field_name' => 'field_' . $vocabulary->machine_name,
-    'type' => 'taxonomy_term_reference',
-    
-    // Set cardinality to unlimited for tagging.
-    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+  // Exported field_base: 'body'
+  $field_bases['body'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(
+      0 => 'node',
+    ),
+    'field_name' => 'body',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'text_with_summary',
+  );
+
+  // Exported field_base: 'comment_body'
+  $field_bases['comment_body'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(
+      0 => 'comment',
+    ),
+    'field_name' => 'comment_body',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'text_long',
+  );
+
+  // Exported field_base: 'field_created'
+  $field_bases['field_created'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_created',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_date_required'
+  $field_bases['field_date_required'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_date_required',
+    'foreign keys' => array(),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'date',
+    'settings' => array(
+      'cache_count' => 4,
+      'cache_enabled' => 0,
+      'granularity' => array(
+        'day' => 'day',
+        'hour' => 'hour',
+        'minute' => 'minute',
+        'month' => 'month',
+        'second' => 0,
+        'year' => 'year',
+      ),
+      'timezone_db' => 'UTC',
+      'todate' => 'required',
+      'tz_handling' => 'site',
+    ),
+    'translatable' => 0,
+    'type' => 'datetime',
+  );
+
+  // Exported field_base: 'field_date_required_to'
+  $field_bases['field_date_required_to'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_date_required_to',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_item'
+  $field_bases['field_item'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_item',
+    'foreign keys' => array(),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'link',
+    'settings' => array(
+      'attributes' => array(
+        'class' => '',
+        'rel' => '',
+        'target' => 'default',
+      ),
+      'display' => array(
+        'url_cutoff' => 80,
+      ),
+      'enable_tokens' => 1,
+      'title' => 'optional',
+      'title_maxlength' => 128,
+      'title_value' => '',
+      'url' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'link_field',
+  );
+
+  // Exported field_base: 'field_item_name'
+  $field_bases['field_item_name'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_item_name',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_item_uri'
+  $field_bases['field_item_uri'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_item_uri',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_location'
+  $field_bases['field_location'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_location',
+    'foreign keys' => array(),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'geofield',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'geofield',
+  );
+
+  // Exported field_base: 'field_name'
+  $field_bases['field_name'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_name',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_notes'
+  $field_bases['field_notes'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_notes',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_request_name'
+  $field_bases['field_request_name'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_request_name',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_request_uri'
+  $field_bases['field_request_uri'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_request_uri',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_request_uri_ref'
+  $field_bases['field_request_uri_ref'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_request_uri_ref',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_response_comment'
+  $field_bases['field_response_comment'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_response_comment',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_response_name'
+  $field_bases['field_response_name'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_response_name',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_response_status'
+  $field_bases['field_response_status'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_response_status',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_site_from'
+  $field_bases['field_site_from'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_site_from',
+    'foreign keys' => array(),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'link',
+    'settings' => array(
+      'attributes' => array(
+        'class' => '',
+        'rel' => '',
+        'target' => 'default',
+      ),
+      'display' => array(
+        'url_cutoff' => 80,
+      ),
+      'enable_tokens' => 1,
+      'title' => 'optional',
+      'title_maxlength' => 128,
+      'title_value' => '',
+      'url' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'link_field',
+  );
+
+  // Exported field_base: 'field_site_from_'
+  $field_bases['field_site_from_'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_site_from_',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_site_to'
+  $field_bases['field_site_to'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_site_to',
+    'foreign keys' => array(),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'link',
+    'settings' => array(
+      'attributes' => array(
+        'class' => '',
+        'rel' => '',
+        'target' => 'default',
+      ),
+      'display' => array(
+        'url_cutoff' => 80,
+      ),
+      'enable_tokens' => 1,
+      'title' => 'optional',
+      'title_maxlength' => 128,
+      'title_value' => '',
+      'url' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'link_field',
+  );
+
+  // Exported field_base: 'field_site_to_'
+  $field_bases['field_site_to_'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_site_to_',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_start_date'
+  $field_bases['field_start_date'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_start_date',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_status'
+  $field_bases['field_status'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_status',
+    'foreign keys' => array(),
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
-        array(
-          'vocabulary' => $vocabulary->machine_name,
-          'parent' => 0,
-        ),
+        'Accept' => 'Accept',
+        'Decline' => 'Decline',
       ),
+      'allowed_values_function' => '',
     ),
+    'translatable' => 0,
+    'type' => 'list_text',
   );
-  field_create_field($field);
 
-  $instance = array(
-    'field_name' => 'field_' . $vocabulary->machine_name,
-    'entity_type' => 'node',
-    'label' => 'Tags',
-    'bundle' => 'article',
-    'description' => $vocabulary->help,
-    'widget' => array(
-      'type' => 'taxonomy_autocomplete',
-      'weight' => -4,
-    ),
+  $field_instances = array();
+
+  // Exported field_instance: 'comment-comment_node_organisation-comment_body'
+  $field_instances['comment-comment_node_organisation-comment_body'] = array(
+    'bundle' => 'comment_node_organisation',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
     'display' => array(
       'default' => array(
-        'type' => 'taxonomy_term_reference_link',
-        'weight' => 10,
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'comment',
+    'field_name' => 'comment_body',
+    'label' => 'Comment',
+    'required' => TRUE,
+    'settings' => array(
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'comment-comment_node_request-comment_body'
+  $field_instances['comment-comment_node_request-comment_body'] = array(
+    'bundle' => 'comment_node_request',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'comment',
+    'field_name' => 'comment_body',
+    'label' => 'Comment',
+    'required' => TRUE,
+    'settings' => array(
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'comment-comment_node_response-comment_body'
+  $field_instances['comment-comment_node_response-comment_body'] = array(
+    'bundle' => 'comment_node_response',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'comment',
+    'field_name' => 'comment_body',
+    'label' => 'Comment',
+    'required' => TRUE,
+    'settings' => array(
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'node-organisation-body'
+  $field_instances['node-organisation-body'] = array(
+    'bundle' => 'organisation',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 1,
+      ),
+      'full' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
       ),
       'teaser' => array(
-        'type' => 'taxonomy_term_reference_link',
-        'weight' => 10,
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'trim_length' => 600,
+        ),
+        'type' => 'text_summary_or_trimmed',
+        'weight' => 0,
       ),
     ),
-  );
-  field_create_instance($instance);
-
-
-  // Create an image field named "Image", enabled for the 'article' content type.
-  // Many of the following values will be defaulted, they're included here as an illustrative examples.
-  // See http://api.drupal.org/api/function/field_create_field/7
-
-  $field = array(
-    'field_name' => 'field_image',
-    'type' => 'image',
-    'cardinality' => 1,
-    'locked' => FALSE,
-    'indexes' => array('fid' => array('fid')),
-    'settings' => array(
-      'uri_scheme' => 'public',
-      'default_image' => FALSE,
-    ),
-    'storage' => array(
-      'type' => 'field_sql_storage',
-      'settings' => array(),
-    ),
-  );
-  field_create_field($field);
-
-
-  // Many of the following values will be defaulted, they're included here as an illustrative examples.
-  // See http://api.drupal.org/api/function/field_create_instance/7
-  $instance = array(
-    'field_name' => 'field_image',
     'entity_type' => 'node',
-    'label' => 'Image',
-    'bundle' => 'article',
-    'description' => st('Upload an image to go with this article.'),
+    'field_name' => 'body',
+    'label' => 'Body',
     'required' => FALSE,
     'settings' => array(
-      'file_directory' => 'field/image',
-      'file_extensions' => 'png gif jpg jpeg',
-      'max_filesize' => '',
-      'max_resolution' => '',
-      'min_resolution' => '',
-      'alt_field' => TRUE,
-      'title_field' => '',
+      'display_summary' => TRUE,
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'type' => 'image_image',
+      'module' => 'text',
       'settings' => array(
-        'progress_indicator' => 'throbber',
-        'preview_image_style' => 'thumbnail',
+        'rows' => 20,
+        'summary_rows' => 5,
       ),
-      'weight' => -1,
+      'type' => 'text_textarea_with_summary',
+      'weight' => 31,
     ),
+  );
+
+  // Exported field_instance: 'node-organisation-field_location'
+  $field_instances['node-organisation-field_location'] = array(
+    'bundle' => 'organisation',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'geofield',
+        'settings' => array(
+          'data' => 'full',
+          'map_preset' => 'geofield_formatter_map_org',
+        ),
+        'type' => 'geofield_openlayers',
+        'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'geofield',
+        'settings' => array(
+          'data' => 'full',
+          'map_preset' => 'geofield_formatter_map',
+        ),
+        'type' => 'geofield_openlayers',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'module' => 'geofield_map',
+        'settings' => array(
+          'geofield_map_baselayers_hybrid' => 0,
+          'geofield_map_baselayers_map' => 1,
+          'geofield_map_baselayers_physical' => 0,
+          'geofield_map_baselayers_satellite' => 0,
+          'geofield_map_controltype' => 'default',
+          'geofield_map_draggable' => 1,
+          'geofield_map_height' => '300px',
+          'geofield_map_maptype' => 'map',
+          'geofield_map_mtc' => 'standard',
+          'geofield_map_overview' => 0,
+          'geofield_map_overview_opened' => 0,
+          'geofield_map_pancontrol' => 1,
+          'geofield_map_scale' => 0,
+          'geofield_map_scrollwheel' => 1,
+          'geofield_map_streetview_show' => 0,
+          'geofield_map_width' => '100%',
+          'geofield_map_zoom' => 8,
+        ),
+        'type' => 'geofield_map_map',
+        'weight' => 1,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_location',
+    'label' => 'location',
+    'required' => 0,
+    'settings' => array(
+      'local_solr' => array(
+        'enabled' => FALSE,
+        'lat_field' => 'lat',
+        'lng_field' => 'lng',
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'geofield',
+      'settings' => array(
+        'data_storage' => 'single',
+        'openlayers_map' => 'geofield_widget_map_org',
+      ),
+      'type' => 'geofield_openlayers',
+      'weight' => 32,
+    ),
+  );
+
+  // Exported field_instance: 'node-request-body'
+  $field_instances['node-request-body'] = array(
+    'bundle' => 'request',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
     'display' => array(
       'default' => array(
         'label' => 'hidden',
-        'type' => 'image',
-        'settings' => array(
-          'image_style' => 'large',
-          'image_link' => '',
-        ),
-        'weight' => -1,
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'hidden',
-        'type' => 'image',
+        'module' => 'text',
         'settings' => array(
-          'image_style' => 'medium',
-          'image_link' => 'content',
+          'trim_length' => 600,
         ),
-        'weight' => -1,
+        'type' => 'text_summary_or_trimmed',
+        'weight' => 0,
       ),
     ),
+    'entity_type' => 'node',
+    'field_name' => 'body',
+    'label' => 'Request Notes',
+    'required' => 0,
+    'settings' => array(
+      'display_summary' => 0,
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 20,
+        'summary_rows' => 5,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => 31,
+    ),
   );
-  field_create_instance($instance);
+
+  // Exported field_instance: 'node-request-field_date_required'
+  $field_instances['node-request-field_date_required'] = array(
+    'bundle' => 'request',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+        ),
+        'type' => 'date_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_date_required',
+    'label' => 'Date Required',
+    'required' => 1,
+    'settings' => array(
+      'default_value' => 'now',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'display_all_day' => 0,
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_popup',
+      'weight' => 32,
+    ),
+  );
+
+  // Exported field_instance: 'node-request-field_item'
+  $field_instances['node-request-field_item'] = array(
+    'bundle' => 'request',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'link',
+        'settings' => array(),
+        'type' => 'link_default',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_item',
+    'label' => 'Item',
+    'required' => 1,
+    'settings' => array(
+      'attributes' => array(
+        'class' => '',
+        'configurable_title' => 0,
+        'rel' => '',
+        'target' => '_blank',
+        'title' => '',
+      ),
+      'display' => array(
+        'url_cutoff' => 80,
+      ),
+      'enable_tokens' => 1,
+      'title' => 'none',
+      'title_maxlength' => 128,
+      'title_value' => '',
+      'url' => 0,
+      'user_register_form' => FALSE,
+      'validate_url' => 1,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'link',
+      'settings' => array(),
+      'type' => 'link_field',
+      'weight' => 35,
+    ),
+  );
+
+  // Exported field_instance: 'node-request-field_site_from'
+  $field_instances['node-request-field_site_from'] = array(
+    'bundle' => 'request',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'link',
+        'settings' => array(),
+        'type' => 'link_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_site_from',
+    'label' => 'Site from',
+    'required' => 1,
+    'settings' => array(
+      'attributes' => array(
+        'class' => '',
+        'configurable_title' => 0,
+        'rel' => '',
+        'target' => '_blank',
+        'title' => '',
+      ),
+      'display' => array(
+        'url_cutoff' => 80,
+      ),
+      'enable_tokens' => 1,
+      'title' => 'none',
+      'title_maxlength' => 128,
+      'title_value' => '',
+      'url' => 0,
+      'user_register_form' => FALSE,
+      'validate_url' => 1,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'link',
+      'settings' => array(),
+      'type' => 'link_field',
+      'weight' => 33,
+    ),
+  );
+
+  // Exported field_instance: 'node-request-field_site_to'
+  $field_instances['node-request-field_site_to'] = array(
+    'bundle' => 'request',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'link',
+        'settings' => array(),
+        'type' => 'link_default',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_site_to',
+    'label' => 'Site to',
+    'required' => 0,
+    'settings' => array(
+      'attributes' => array(
+        'class' => '',
+        'configurable_title' => 0,
+        'rel' => '',
+        'target' => '_blank',
+        'title' => '',
+      ),
+      'display' => array(
+        'url_cutoff' => 80,
+      ),
+      'enable_tokens' => 1,
+      'title' => 'none',
+      'title_maxlength' => 128,
+      'title_value' => '',
+      'url' => 0,
+      'user_register_form' => FALSE,
+      'validate_url' => 1,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'link',
+      'settings' => array(),
+      'type' => 'link_field',
+      'weight' => 34,
+    ),
+  );
+
+  // Exported field_instance: 'node-response-body'
+  $field_instances['node-response-body'] = array(
+    'bundle' => 'response',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'trim_length' => 600,
+        ),
+        'type' => 'text_summary_or_trimmed',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'body',
+    'label' => 'Response Notes',
+    'required' => 0,
+    'settings' => array(
+      'display_summary' => 1,
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 20,
+        'summary_rows' => 5,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => 31,
+    ),
+  );
+
+  // Exported field_instance: 'node-response-field_request_uri'
+  $field_instances['node-response-field_request_uri'] = array(
+    'bundle' => 'response',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_request_uri',
+    'label' => 'Request URI',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 34,
+    ),
+  );
+
+  // Exported field_instance: 'node-response-field_status'
+  $field_instances['node-response-field_status'] = array(
+    'bundle' => 'response',
+    'default_value' => array(
+      0 => array(
+        'value' => 'Accept',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_status',
+    'label' => 'Status',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_buttons',
+      'weight' => 33,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-another_site_s_resources-field_created'
+  $field_instances['sparql_views_resource-another_site_s_resources-field_created'] = array(
+    'bundle' => 'another_site_s_resources',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_created',
+    'label' => 'created',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-another_site_s_resources-field_name'
+  $field_instances['sparql_views_resource-another_site_s_resources-field_name'] = array(
+    'bundle' => 'another_site_s_resources',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_name',
+    'label' => 'name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-external_resource-field_item_name'
+  $field_instances['sparql_views_resource-external_resource-field_item_name'] = array(
+    'bundle' => 'external_resource',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_item_name',
+    'label' => 'item name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-requests-field_date_required_to'
+  $field_instances['sparql_views_resource-requests-field_date_required_to'] = array(
+    'bundle' => 'requests',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_date_required_to',
+    'label' => 'Date Required To',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-requests-field_item_uri'
+  $field_instances['sparql_views_resource-requests-field_item_uri'] = array(
+    'bundle' => 'requests',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_item_uri',
+    'label' => 'item uri',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-requests-field_notes'
+  $field_instances['sparql_views_resource-requests-field_notes'] = array(
+    'bundle' => 'requests',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 6,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_notes',
+    'label' => 'Notes',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-requests-field_request_name'
+  $field_instances['sparql_views_resource-requests-field_request_name'] = array(
+    'bundle' => 'requests',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_request_name',
+    'label' => 'Request Name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-requests-field_site_from_'
+  $field_instances['sparql_views_resource-requests-field_site_from_'] = array(
+    'bundle' => 'requests',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_site_from_',
+    'label' => 'Site from',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-requests-field_site_to_'
+  $field_instances['sparql_views_resource-requests-field_site_to_'] = array(
+    'bundle' => 'requests',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_site_to_',
+    'label' => 'Site to',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-requests-field_start_date'
+  $field_instances['sparql_views_resource-requests-field_start_date'] = array(
+    'bundle' => 'requests',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_start_date',
+    'label' => 'start date',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-response-field_request_uri_ref'
+  $field_instances['sparql_views_resource-response-field_request_uri_ref'] = array(
+    'bundle' => 'response',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_request_uri_ref',
+    'label' => 'Request URI',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-response-field_response_comment'
+  $field_instances['sparql_views_resource-response-field_response_comment'] = array(
+    'bundle' => 'response',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_response_comment',
+    'label' => 'Response Comment',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-response-field_response_name'
+  $field_instances['sparql_views_resource-response-field_response_name'] = array(
+    'bundle' => 'response',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_response_name',
+    'label' => 'Response Name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance: 'sparql_views_resource-response-field_response_status'
+  $field_instances['sparql_views_resource-response-field_response_status'] = array(
+    'bundle' => 'response',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+    ),
+    'entity_type' => 'sparql_views_resource',
+    'field_name' => 'field_response_status',
+    'label' => 'Response Status',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 3,
+    ),
+  );
+
+  // Translatables
+  // Included for use with string extractors like potx.
+  st('Body');
+  st('Comment');
+  st('Date Required');
+  st('Date Required To');
+  st('Item');
+  st('Notes');
+  st('Request Name');
+  st('Request Notes');
+  st('Request URI');
+  st('Response Comment');
+  st('Response Name');
+  st('Response Notes');
+  st('Response Status');
+  st('Site from');
+  st('Site to');
+  st('Status');
+  st('created');
+  st('item name');
+  st('item uri');
+  st('location');
+  st('name');
+  st('start date');
+
+
+/**
+ * this was function sierra_ctools_plugin_api()
+ */
+  list($module, $api) = func_get_args();
+  if ($module == "openlayers" && $api == "openlayers_maps") {
+     array("version" => "1");
+  }
+
+
+/**
+ * This was function hook_views_api().
+ */
+  return array("api" => "3.0");
+
+  $menus = array();
+
+  // Exported menu: navigation.
+  $menus['navigation'] = array(
+    'menu_name' => 'navigation',
+    'title' => 'Navigation',
+    'description' => 'The <em>Navigation</em> menu contains links intended for site visitors. Links are added to the <em>Navigation</em> menu automatically by some modules.',
+  );
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('Navigation');
+  t('The <em>Navigation</em> menu contains links intended for site visitors. Links are added to the <em>Navigation</em> menu automatically by some modules.');
+
+
+  $menu_links = array();
+
+  // Exported menu link: navigation:<nolink>
+  $menu_links['navigation:<nolink>'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => '<nolink>',
+    'router_path' => '<nolink>',
+    'link_title' => 'Resources',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 1,
+    'expanded' => 1,
+    'weight' => -48,
+  );
+  // Exported menu link: navigation:external-resource-search
+  $menu_links['navigation:external-resource-search'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'external-resource-search',
+    'router_path' => 'external-resource-search',
+    'link_title' => 'Find',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -49,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:external-resources
+  $menu_links['navigation:external-resources'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'external-resources',
+    'router_path' => 'external-resources',
+    'link_title' => 'List',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -50,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:filter/tips
+  $menu_links['navigation:filter/tips'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'filter/tips',
+    'router_path' => 'filter/tips',
+    'link_title' => 'Compose tips',
+    'options' => array(),
+    'module' => 'system',
+    'hidden' => 1,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -49,
+  );
+  // Exported menu link: navigation:list
+  $menu_links['navigation:list'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'list',
+    'router_path' => 'list',
+    'link_title' => 'List',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'system',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -50,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:map
+  $menu_links['navigation:map'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'map',
+    'router_path' => 'map',
+    'link_title' => 'Map',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'system',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -49,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:network-requests
+  $menu_links['navigation:network-requests'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'network-requests',
+    'router_path' => 'network-requests',
+    'link_title' => 'Network',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -49,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:network-responses
+  $menu_links['navigation:network-responses'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'network-responses',
+    'router_path' => 'network-responses',
+    'link_title' => 'Network',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -49,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:node/add
+  $menu_links['navigation:node/add'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'node/add',
+    'router_path' => 'node/add',
+    'link_title' => 'Register',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'system',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 1,
+    'expanded' => 0,
+    'weight' => -48,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:node/add/organisation
+  $menu_links['navigation:node/add/organisation'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'node/add/organisation',
+    'router_path' => 'node/add/organisation',
+    'link_title' => 'Organisation',
+    'options' => array(),
+    'module' => 'system',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -49,
+    'parent_path' => 'node/add',
+  );
+  // Exported menu link: navigation:node/add/request
+  $menu_links['navigation:node/add/request'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'node/add/request',
+    'router_path' => 'node/add/request',
+    'link_title' => 'Create Request',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'system',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -48,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:node/add/response
+  $menu_links['navigation:node/add/response'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'node/add/response',
+    'router_path' => 'node/add/response',
+    'link_title' => 'Create Response',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'system',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -48,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:requests
+  $menu_links['navigation:requests'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'requests',
+    'router_path' => 'requests',
+    'link_title' => 'Local',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -50,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:responses
+  $menu_links['navigation:responses'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'responses',
+    'router_path' => 'responses',
+    'link_title' => 'Local',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -50,
+    'parent_path' => '<nolink>',
+  );
+  // Exported menu link: navigation:search
+  $menu_links['navigation:search'] = array(
+    'menu_name' => 'navigation',
+    'link_path' => 'search',
+    'router_path' => 'search',
+    'link_title' => 'Search',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'system',
+    'hidden' => 1,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -50,
+  );
+
+// I don't think that this is going to work for the translatables
+// It's stolen from features code. Fix it. - lishevita
+  // Translatables
+  // Included for use with string extractors like potx.
+  st('Compose tips');
+  st('Create Request');
+  st('Create Response');
+  st('Find');
+  st('List');
+  st('Local');
+  st('Map');
+  st('Network');
+  st('Organisation');
+  st('Register');
+  st('Resources');
+  st('Search');
+
+   // go through all the links and save them
+   foreach ($menu_links as $menu_link) {
+	menu_link_save($menu_link);
+   }
+   
+  // Update the menu router information.
+  menu_rebuild();
+
+// what the heck is this? I don't know
+// snagged from code spit out by features.
+  $export = array();  
+
+  $openlayers_maps = new stdClass();
+  $openlayers_maps->disabled = FALSE; /* Edit this to true to make a default openlayers_maps disabled initially */
+  $openlayers_maps->api_version = 1;
+  $openlayers_maps->name = 'geofield_formatter_map_org';
+  $openlayers_maps->title = 'Geofield Formatter Map Org';
+  $openlayers_maps->description = 'A Map Used for Geofield Output';
+  $openlayers_maps->data = array(
+    'width' => '600px',
+    'height' => '400px',
+    'image_path' => 'sites/all/modules/openlayers/themes/default_dark/img/',
+    'css_path' => 'sites/all/modules/openlayers/themes/default_dark/style.css',
+    'proxy_host' => '',
+    'hide_empty_map' => 0,
+    'center' => array(
+      'initial' => array(
+        'centerpoint' => '1.823736577294, 51.467693150871',
+        'zoom' => '3',
+      ),
+      'restrict' => array(
+        'restrictextent' => 0,
+        'restrictedExtent' => '',
+      ),
+    ),
+    'behaviors' => array(
+      'openlayers_behavior_geolocate' => array(
+        'bind' => '1',
+        'zoom_level' => '3',
+        'watch' => '1',
+      ),
+      'openlayers_behavior_keyboarddefaults' => array(),
+      'openlayers_behavior_navigation' => array(
+        'zoomWheelEnabled' => 0,
+        'zoomBoxEnabled' => 1,
+        'documentDrag' => 0,
+      ),
+      'openlayers_behavior_panzoombar' => array(
+        'zoomWorldIcon' => 0,
+        'panIcons' => 1,
+      ),
+    ),
+    'default_layer' => 'mapquest_osm',
+    'layers' => array(
+      'mapquest_osm' => 'mapquest_osm',
+      'geofield_formatter' => 'geofield_formatter',
+    ),
+    'layer_weight' => array(
+      'geofield_formatter' => '0',
+      'map_openlayers_1' => '0',
+      'openlayers_geojson_picture_this' => '0',
+    ),
+    'layer_styles' => array(
+      'openlayers_geojson_picture_this' => '0',
+      'map_openlayers_1' => '0',
+      'geofield_formatter' => '0',
+    ),
+    'layer_styles_select' => array(
+      'openlayers_geojson_picture_this' => '0',
+      'map_openlayers_1' => '0',
+      'geofield_formatter' => '0',
+    ),
+    'layer_activated' => array(
+      'geofield_formatter' => 'geofield_formatter',
+      'openlayers_geojson_picture_this' => 0,
+      'map_openlayers_1' => 0,
+    ),
+    'layer_switcher' => array(
+      'geofield_formatter' => 0,
+      'openlayers_geojson_picture_this' => 0,
+      'map_openlayers_1' => 0,
+    ),
+    'projection' => '900913',
+    'displayProjection' => '4326',
+    'styles' => array(
+      'default' => 'default',
+      'select' => 'default',
+      'temporary' => 'default',
+    ),
+  );
+  $export['geofield_formatter_map_org'] = $openlayers_maps;
+
+  $openlayers_maps = new stdClass();
+  $openlayers_maps->disabled = FALSE; /* Edit this to true to make a default openlayers_maps disabled initially */
+  $openlayers_maps->api_version = 1;
+  $openlayers_maps->name = 'geofield_formatter_map_org_new';
+  $openlayers_maps->title = 'Geofield Formatter Map Org new';
+  $openlayers_maps->description = 'A Map Used for Geofield Output';
+  $openlayers_maps->data = array(
+    'width' => '800px',
+    'height' => '600px',
+    'image_path' => 'sites/all/modules/openlayers/themes/default_dark/img/',
+    'css_path' => 'sites/all/modules/openlayers/themes/default_dark/style.css',
+    'proxy_host' => '',
+    'hide_empty_map' => 0,
+    'center' => array(
+      'initial' => array(
+        'centerpoint' => '1.823736577294, 51.467693150871',
+        'zoom' => '3',
+      ),
+      'restrict' => array(
+        'restrictextent' => 0,
+        'restrictedExtent' => '',
+      ),
+    ),
+    'behaviors' => array(
+      'openlayers_behavior_geolocate' => array(
+        'bind' => '1',
+        'zoom_level' => '3',
+        'watch' => '1',
+      ),
+      'openlayers_behavior_keyboarddefaults' => array(),
+      'openlayers_behavior_navigation' => array(
+        'zoomWheelEnabled' => 0,
+        'zoomBoxEnabled' => 1,
+        'documentDrag' => 0,
+      ),
+      'openlayers_behavior_panzoombar' => array(
+        'zoomWorldIcon' => 0,
+        'panIcons' => 1,
+      ),
+    ),
+    'default_layer' => 'mapquest_osm',
+    'layers' => array(
+      'mapquest_osm' => 'mapquest_osm',
+      'map_openlayers_1' => 'map_openlayers_1',
+    ),
+    'layer_weight' => array(
+      'map_openlayers_1' => '0',
+      'openlayers_geojson_picture_this' => '0',
+      'geofield_formatter' => '0',
+    ),
+    'layer_styles' => array(
+      'geofield_formatter' => '0',
+      'openlayers_geojson_picture_this' => '0',
+      'map_openlayers_1' => '0',
+    ),
+    'layer_styles_select' => array(
+      'geofield_formatter' => '0',
+      'openlayers_geojson_picture_this' => '0',
+      'map_openlayers_1' => '0',
+    ),
+    'layer_activated' => array(
+      'map_openlayers_1' => 'map_openlayers_1',
+      'geofield_formatter' => 0,
+      'openlayers_geojson_picture_this' => 0,
+    ),
+    'layer_switcher' => array(
+      'map_openlayers_1' => 0,
+      'geofield_formatter' => 0,
+      'openlayers_geojson_picture_this' => 0,
+    ),
+    'projection' => '900913',
+    'displayProjection' => '4326',
+    'styles' => array(
+      'default' => 'default_marker_green',
+      'select' => 'default_marker_red',
+      'temporary' => 'default_marker_blue',
+    ),
+  );
+  $export['geofield_formatter_map_org_new'] = $openlayers_maps;
+
+  $openlayers_maps = new stdClass();
+  $openlayers_maps->disabled = FALSE; /* Edit this to true to make a default openlayers_maps disabled initially */
+  $openlayers_maps->api_version = 1;
+  $openlayers_maps->name = 'geofield_widget_map_org';
+  $openlayers_maps->title = 'Geofield Widget Map Organisation';
+  $openlayers_maps->description = 'A Map Used for Geofield Input';
+  $openlayers_maps->data = array(
+    'width' => '600px',
+    'height' => '400px',
+    'image_path' => 'sites/all/modules/openlayers/themes/default_dark/img/',
+    'css_path' => 'sites/all/modules/openlayers/themes/default_dark/style.css',
+    'proxy_host' => '',
+    'hide_empty_map' => 0,
+    'center' => array(
+      'initial' => array(
+        'centerpoint' => '7.1880166204614, 48.485525910378',
+        'zoom' => '4',
+      ),
+      'restrict' => array(
+        'restrictextent' => 0,
+        'restrictedExtent' => '',
+      ),
+    ),
+    'behaviors' => array(
+      'openlayers_behavior_geofield' => array(
+        'feature_types' => array(
+          'point' => 'point',
+          'path' => 'path',
+          'polygon' => 'polygon',
+        ),
+        'allow_edit' => 1,
+      ),
+      'openlayers_behavior_keyboarddefaults' => array(),
+      'openlayers_behavior_navigation' => array(
+        'zoomWheelEnabled' => 0,
+        'zoomBoxEnabled' => 1,
+        'documentDrag' => 0,
+      ),
+      'openlayers_behavior_panzoombar' => array(
+        'zoomWorldIcon' => 0,
+        'panIcons' => 1,
+      ),
+    ),
+    'default_layer' => 'mapquest_osm',
+    'layers' => array(
+      'mapquest_osm' => 'mapquest_osm',
+    ),
+    'layer_weight' => array(
+      'map_openlayers_1' => '0',
+      'openlayers_geojson_picture_this' => '0',
+      'geofield_formatter' => '0',
+    ),
+    'layer_styles' => array(
+      'geofield_formatter' => '0',
+      'openlayers_geojson_picture_this' => '0',
+      'map_openlayers_1' => '0',
+    ),
+    'layer_styles_select' => array(
+      'geofield_formatter' => '0',
+      'openlayers_geojson_picture_this' => '0',
+      'map_openlayers_1' => '0',
+    ),
+    'layer_activated' => array(
+      'geofield_formatter' => 0,
+      'openlayers_geojson_picture_this' => 0,
+      'map_openlayers_1' => 0,
+    ),
+    'layer_switcher' => array(
+      'geofield_formatter' => 0,
+      'openlayers_geojson_picture_this' => 0,
+      'map_openlayers_1' => 0,
+    ),
+    'projection' => '900913',
+    'displayProjection' => '4326',
+    'styles' => array(
+      'default' => 'default',
+      'select' => 'default',
+      'temporary' => 'default',
+    ),
+  );
+  $export['geofield_widget_map_org'] = $openlayers_maps;
+
+
+  $view = new view();
+  $view->name = 'external_resource_search';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'sparql_views_-1464584620';
+  $view->human_name = 'External Resource Search';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'External Resources';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['style_plugin'] = 'table';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['external_resource_field_item_name']['id'] = 'external_resource_field_item_name';
+  $handler->display->display_options['fields']['external_resource_field_item_name']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['external_resource_field_item_name']['field'] = 'external_resource_field_item_name';
+  $handler->display->display_options['fields']['external_resource_field_item_name']['label'] = 'item name';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['external_resource']['id'] = 'external_resource';
+  $handler->display->display_options['fields']['external_resource']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['external_resource']['field'] = 'external_resource';
+  $handler->display->display_options['fields']['external_resource']['label'] = 'URI';
+  $handler->display->display_options['filter_groups']['groups'] = array(
+    1 => 'OR',
+  );
+  /* Filter criterion: Broken/missing handler */
+  $handler->display->display_options['filters']['external_resource_field_item_name']['id'] = 'external_resource_field_item_name';
+  $handler->display->display_options['filters']['external_resource_field_item_name']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['filters']['external_resource_field_item_name']['field'] = 'external_resource_field_item_name';
+  $handler->display->display_options['filters']['external_resource_field_item_name']['operator'] = 'contains';
+  $handler->display->display_options['filters']['external_resource_field_item_name']['group'] = 1;
+  $handler->display->display_options['filters']['external_resource_field_item_name']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['external_resource_field_item_name']['expose']['operator_id'] = 'external_resource_field_item_name_op';
+  $handler->display->display_options['filters']['external_resource_field_item_name']['expose']['label'] = 'Search for Resources:';
+  $handler->display->display_options['filters']['external_resource_field_item_name']['expose']['operator'] = 'external_resource_field_item_name_op';
+  $handler->display->display_options['filters']['external_resource_field_item_name']['expose']['identifier'] = 'external_resource_field_item_name';
+  $handler->display->display_options['filters']['external_resource_field_item_name']['expose']['required'] = TRUE;
+  $handler->display->display_options['filters']['external_resource_field_item_name']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+  );
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['path'] = 'external-resource-search';
+  $export['external_resource_search'] = $view;
+
+  $view = new view();
+  $view->name = 'external_resources';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'sparql_views_-1464584620';
+  $view->human_name = 'External Resources';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'External Resources';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'table';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['external_resource_field_item_name']['id'] = 'external_resource_field_item_name';
+  $handler->display->display_options['fields']['external_resource_field_item_name']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['external_resource_field_item_name']['field'] = 'external_resource_field_item_name';
+  $handler->display->display_options['fields']['external_resource_field_item_name']['label'] = 'Name';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['external_resource']['id'] = 'external_resource';
+  $handler->display->display_options['fields']['external_resource']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['external_resource']['field'] = 'external_resource';
+  $handler->display->display_options['fields']['external_resource']['label'] = 'URI';
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['path'] = 'external-resources';
+  $export['external_resources'] = $view;
+
+  $view = new view();
+  $view->name = 'list';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'List';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'List';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'title' => 'title',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'title' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['label'] = '';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  /* Field: Content: Type */
+  $handler->display->display_options['fields']['type']['id'] = 'type';
+  $handler->display->display_options['fields']['type']['table'] = 'node';
+  $handler->display->display_options['fields']['type']['field'] = 'type';
+  /* Field: Content: location */
+  $handler->display->display_options['fields']['field_location']['id'] = 'field_location';
+  $handler->display->display_options['fields']['field_location']['table'] = 'field_data_field_location';
+  $handler->display->display_options['fields']['field_location']['field'] = 'field_location';
+  $handler->display->display_options['fields']['field_location']['click_sort_column'] = 'wkt';
+  $handler->display->display_options['fields']['field_location']['type'] = 'geofield_latlon';
+  $handler->display->display_options['fields']['field_location']['settings'] = array(
+    'data' => 'full',
+    'format' => 'decimal_degrees',
+    'labels' => 1,
+  );
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
+  $handler->display->display_options['sorts']['title']['order'] = 'DESC';
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type_1']['id'] = 'type_1';
+  $handler->display->display_options['filters']['type_1']['table'] = 'node';
+  $handler->display->display_options['filters']['type_1']['field'] = 'type';
+  $handler->display->display_options['filters']['type_1']['operator'] = 'not in';
+  $handler->display->display_options['filters']['type_1']['value'] = array(
+    'request' => 'request',
+  );
+  $handler->display->display_options['filters']['type_1']['group'] = 1;
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['path'] = 'list';
+  $handler->display->display_options['menu']['type'] = 'normal';
+  $handler->display->display_options['menu']['title'] = 'List';
+  $handler->display->display_options['menu']['name'] = 'main-menu';
+  $export['list'] = $view;
+
+  $view = new view();
+  $view->name = 'map';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'Map';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Map';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '100';
+  $handler->display->display_options['style_plugin'] = 'openlayers_map';
+  $handler->display->display_options['style_options']['map'] = 'geofield_formatter_map_org_new';
+  /* Field: Content: location */
+  $handler->display->display_options['fields']['field_location']['id'] = 'field_location';
+  $handler->display->display_options['fields']['field_location']['table'] = 'field_data_field_location';
+  $handler->display->display_options['fields']['field_location']['field'] = 'field_location';
+  $handler->display->display_options['fields']['field_location']['click_sort_column'] = 'wkt';
+  $handler->display->display_options['fields']['field_location']['settings'] = array(
+    'data' => 'full',
+  );
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'organisation' => 'organisation',
+  );
+
+  /* Display: OpenLayers Data Overlay */
+  $handler = $view->new_display('openlayers', 'OpenLayers Data Overlay', 'openlayers_1');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'openlayers_data';
+  $handler->display->display_options['style_options']['grouping'] = array(
+    0 => array(
+      'field' => 'field_location',
+      'rendered' => 1,
+      'rendered_strip' => 0,
+    ),
+  );
+  $handler->display->display_options['style_options']['data_source'] = array(
+    'value' => 'wkt',
+    'other_lat' => 'field_location',
+    'other_lon' => 'field_location',
+    'wkt' => 'field_location',
+    'other_top' => 'field_location',
+    'other_right' => 'field_location',
+    'other_bottom' => 'field_location',
+    'other_left' => 'field_location',
+    'name_field' => '',
+    'description_field' => '',
+  );
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'fields';
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page_1');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['path'] = 'map';
+  $handler->display->display_options['menu']['type'] = 'normal';
+  $handler->display->display_options['menu']['title'] = 'Show all Resources';
+  $handler->display->display_options['menu']['weight'] = '0';
+  $handler->display->display_options['menu']['context'] = 0;
+  $export['map'] = $view;
+
+  $view = new view();
+  $view->name = 'network_responses';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'sparql_views_-1464584620';
+  $view->human_name = 'Network Responses';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Network Responses';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'response_type' => 'response_type',
+    'response_field_request_uri_ref' => 'response_field_request_uri_ref',
+    'response_field_response_name' => 'response_field_response_name',
+    'response_field_response_status' => 'response_field_response_status',
+    'response' => 'response',
+    'response_field_response_comment' => 'response_field_response_comment',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'response_type' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'response_field_request_uri_ref' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'response_field_response_name' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'response_field_response_status' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'response' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'response_field_response_comment' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['response_type']['id'] = 'response_type';
+  $handler->display->display_options['fields']['response_type']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['response_type']['field'] = 'response_type';
+  $handler->display->display_options['fields']['response_type']['label'] = 'RDF type';
+  $handler->display->display_options['fields']['response_type']['exclude'] = TRUE;
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['response_field_response_name']['id'] = 'response_field_response_name';
+  $handler->display->display_options['fields']['response_field_response_name']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['response_field_response_name']['field'] = 'response_field_response_name';
+  $handler->display->display_options['fields']['response_field_response_name']['label'] = 'Response Name';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['response_field_response_status']['id'] = 'response_field_response_status';
+  $handler->display->display_options['fields']['response_field_response_status']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['response_field_response_status']['field'] = 'response_field_response_status';
+  $handler->display->display_options['fields']['response_field_response_status']['label'] = 'Response Status';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['response_field_response_comment']['id'] = 'response_field_response_comment';
+  $handler->display->display_options['fields']['response_field_response_comment']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['response_field_response_comment']['field'] = 'response_field_response_comment';
+  $handler->display->display_options['fields']['response_field_response_comment']['label'] = 'Response Comment';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['response_field_request_uri_ref']['id'] = 'response_field_request_uri_ref';
+  $handler->display->display_options['fields']['response_field_request_uri_ref']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['response_field_request_uri_ref']['field'] = 'response_field_request_uri_ref';
+  $handler->display->display_options['fields']['response_field_request_uri_ref']['label'] = 'Request URI';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['response']['id'] = 'response';
+  $handler->display->display_options['fields']['response']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['response']['field'] = 'response';
+  $handler->display->display_options['fields']['response']['label'] = 'URI';
+  /* Filter criterion: Broken/missing handler */
+  $handler->display->display_options['filters']['response_type']['id'] = 'response_type';
+  $handler->display->display_options['filters']['response_type']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['filters']['response_type']['field'] = 'response_type';
+  $handler->display->display_options['filters']['response_type']['value'] = 'http://registry.aston.ac.uk/ns/rr#Response';
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['path'] = 'network-responses';
+  $export['network_responses'] = $view;
+
+  $view = new view();
+  $view->name = 'reqests';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'Requests';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Requests';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['style_plugin'] = 'table';
+  /* Field: Content: Type */
+  $handler->display->display_options['fields']['type']['id'] = 'type';
+  $handler->display->display_options['fields']['type']['table'] = 'node';
+  $handler->display->display_options['fields']['type']['field'] = 'type';
+  $handler->display->display_options['fields']['type']['label'] = '';
+  $handler->display->display_options['fields']['type']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['type']['element_label_colon'] = FALSE;
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  /* Field: Content: Date Required */
+  $handler->display->display_options['fields']['field_date_required']['id'] = 'field_date_required';
+  $handler->display->display_options['fields']['field_date_required']['table'] = 'field_data_field_date_required';
+  $handler->display->display_options['fields']['field_date_required']['field'] = 'field_date_required';
+  $handler->display->display_options['fields']['field_date_required']['label'] = 'Dates Required';
+  $handler->display->display_options['fields']['field_date_required']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_date_required']['settings'] = array(
+    'format_type' => 'medium',
+    'fromto' => 'both',
+    'multiple_number' => '',
+    'multiple_from' => '',
+    'multiple_to' => '',
+  );
+  /* Field: Content: Item */
+  $handler->display->display_options['fields']['field_item']['id'] = 'field_item';
+  $handler->display->display_options['fields']['field_item']['table'] = 'field_data_field_item';
+  $handler->display->display_options['fields']['field_item']['field'] = 'field_item';
+  $handler->display->display_options['fields']['field_item']['label'] = 'Item URI';
+  $handler->display->display_options['fields']['field_item']['click_sort_column'] = 'url';
+  $handler->display->display_options['fields']['field_item']['type'] = 'link_url';
+  /* Field: Content: Site from */
+  $handler->display->display_options['fields']['field_site_from']['id'] = 'field_site_from';
+  $handler->display->display_options['fields']['field_site_from']['table'] = 'field_data_field_site_from';
+  $handler->display->display_options['fields']['field_site_from']['field'] = 'field_site_from';
+  $handler->display->display_options['fields']['field_site_from']['click_sort_column'] = 'url';
+  $handler->display->display_options['fields']['field_site_from']['type'] = 'link_url';
+  /* Field: Content: Site to */
+  $handler->display->display_options['fields']['field_site_to']['id'] = 'field_site_to';
+  $handler->display->display_options['fields']['field_site_to']['table'] = 'field_data_field_site_to';
+  $handler->display->display_options['fields']['field_site_to']['field'] = 'field_site_to';
+  $handler->display->display_options['fields']['field_site_to']['click_sort_column'] = 'url';
+  $handler->display->display_options['fields']['field_site_to']['type'] = 'link_url';
+  /* Sort criterion: Content: Post date */
+  $handler->display->display_options['sorts']['created']['id'] = 'created';
+  $handler->display->display_options['sorts']['created']['table'] = 'node';
+  $handler->display->display_options['sorts']['created']['field'] = 'created';
+  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'request' => 'request',
+  );
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['path'] = 'requests';
+  $export['reqests'] = $view;
+
+  $view = new view();
+  $view->name = 'responses_local_';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'Responses (local)';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Responses (local)';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'table';
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  /* Field: Content: Request URI */
+  $handler->display->display_options['fields']['field_request_uri']['id'] = 'field_request_uri';
+  $handler->display->display_options['fields']['field_request_uri']['table'] = 'field_data_field_request_uri';
+  $handler->display->display_options['fields']['field_request_uri']['field'] = 'field_request_uri';
+  /* Field: Content: Response Notes */
+  $handler->display->display_options['fields']['body']['id'] = 'body';
+  $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
+  $handler->display->display_options['fields']['body']['field'] = 'body';
+  /* Field: Content: Status */
+  $handler->display->display_options['fields']['field_status']['id'] = 'field_status';
+  $handler->display->display_options['fields']['field_status']['table'] = 'field_data_field_status';
+  $handler->display->display_options['fields']['field_status']['field'] = 'field_status';
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'response' => 'response',
+  );
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['path'] = 'responses';
+  $export['responses_local_'] = $view;
+
+  $view = new view();
+  $view->name = 'test_sparql';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'sparql_views_-1464584620';
+  $view->human_name = 'External Requests';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'requests (network)';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['grouping'] = array(
+    0 => array(
+      'field' => 'requests_field_site_to_',
+      'rendered' => 1,
+      'rendered_strip' => 0,
+    ),
+  );
+  $handler->display->display_options['style_options']['columns'] = array(
+    'requests_field_request_name' => 'requests_field_request_name',
+    'requests_field_item_uri' => 'requests_field_item_uri',
+    'requests_field_start_date' => 'requests_field_start_date',
+    'requests_field_date_required_to' => 'requests_field_date_required_to',
+    'requests_field_site_from_' => 'requests_field_site_from_',
+    'requests_field_site_to_' => 'requests_field_site_to_',
+    'requests_field_notes' => 'requests_field_notes',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'requests_field_request_name' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'requests_field_item_uri' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'requests_field_start_date' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'requests_field_date_required_to' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'requests_field_site_from_' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'requests_field_site_to_' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'requests_field_notes' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['requests_field_request_name']['id'] = 'requests_field_request_name';
+  $handler->display->display_options['fields']['requests_field_request_name']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['requests_field_request_name']['field'] = 'requests_field_request_name';
+  $handler->display->display_options['fields']['requests_field_request_name']['label'] = 'Request Name';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['requests_field_item_uri']['id'] = 'requests_field_item_uri';
+  $handler->display->display_options['fields']['requests_field_item_uri']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['requests_field_item_uri']['field'] = 'requests_field_item_uri';
+  $handler->display->display_options['fields']['requests_field_item_uri']['label'] = 'item uri';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['requests_field_start_date']['id'] = 'requests_field_start_date';
+  $handler->display->display_options['fields']['requests_field_start_date']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['requests_field_start_date']['field'] = 'requests_field_start_date';
+  $handler->display->display_options['fields']['requests_field_start_date']['label'] = 'start date';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['requests_field_date_required_to']['id'] = 'requests_field_date_required_to';
+  $handler->display->display_options['fields']['requests_field_date_required_to']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['requests_field_date_required_to']['field'] = 'requests_field_date_required_to';
+  $handler->display->display_options['fields']['requests_field_date_required_to']['label'] = 'Date Required To';
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['requests_field_site_from_']['id'] = 'requests_field_site_from_';
+  $handler->display->display_options['fields']['requests_field_site_from_']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['requests_field_site_from_']['field'] = 'requests_field_site_from_';
+  $handler->display->display_options['fields']['requests_field_site_from_']['label'] = 'Item\'s Site';
+  $handler->display->display_options['fields']['requests_field_site_from_']['exclude'] = TRUE;
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['requests_field_site_to_']['id'] = 'requests_field_site_to_';
+  $handler->display->display_options['fields']['requests_field_site_to_']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['requests_field_site_to_']['field'] = 'requests_field_site_to_';
+  $handler->display->display_options['fields']['requests_field_site_to_']['label'] = 'Requesting Site';
+  $handler->display->display_options['fields']['requests_field_site_to_']['exclude'] = TRUE;
+  /* Field: Broken/missing handler */
+  $handler->display->display_options['fields']['requests_field_notes']['id'] = 'requests_field_notes';
+  $handler->display->display_options['fields']['requests_field_notes']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['fields']['requests_field_notes']['field'] = 'requests_field_notes';
+  $handler->display->display_options['fields']['requests_field_notes']['label'] = 'Notes';
+  /* Filter criterion: Broken/missing handler */
+  $handler->display->display_options['filters']['requests_type']['id'] = 'requests_type';
+  $handler->display->display_options['filters']['requests_type']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['filters']['requests_type']['field'] = 'requests_type';
+  $handler->display->display_options['filters']['requests_type']['value'] = 'http://registry.aston.ac.uk/ns/rr#Request';
+  $handler->display->display_options['filters']['requests_type']['group'] = 1;
+  /* Filter criterion: Broken/missing handler */
+  $handler->display->display_options['filters']['requests_field_item_uri']['id'] = 'requests_field_item_uri';
+  $handler->display->display_options['filters']['requests_field_item_uri']['table'] = 'sparql_views_-1464584620';
+  $handler->display->display_options['filters']['requests_field_item_uri']['field'] = 'requests_field_item_uri';
+  $handler->display->display_options['filters']['requests_field_item_uri']['operator'] = 'contains';
+  $handler->display->display_options['filters']['requests_field_item_uri']['value'] = 'http://registry.aston.ac.uk/registry';
+  $handler->display->display_options['filters']['requests_field_item_uri']['expose']['operator_id'] = 'requests_field_item_uri_op';
+  $handler->display->display_options['filters']['requests_field_item_uri']['expose']['label'] = 'item uri';
+  $handler->display->display_options['filters']['requests_field_item_uri']['expose']['operator'] = 'requests_field_item_uri_op';
+  $handler->display->display_options['filters']['requests_field_item_uri']['expose']['identifier'] = 'requests_field_item_uri';
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['path'] = 'network-requests';
+  $export['test_sparql'] = $view;
+
 
   // Enable default permissions for system roles.
   $filtered_html_permission = filter_permission_name($filtered_html_format);
@@ -412,16 +3471,7 @@ $filtered_html_format = array(
   // Assign user 1 the "administrator" role.
   db_insert('users_roles')->fields(array('uid' => 1, 'rid' => $admin_role->rid))->execute();
 
-  // Create a Home link in the main menu.
-  $item = array(
-    'link_title' => st('Home'),
-    'link_path' => '<front>',
-    'menu_name' => 'main-menu',
-  );
-  menu_link_save($item);
-
-  // Update the menu router information.
-  menu_rebuild();
+   
 
   // Enable the admin theme.
   db_update('system')->fields(array('status' => 1))->condition('type', 'theme')->condition('name', 'seven')->execute();
