@@ -1,0 +1,6 @@
+name = Pathauto for RDF
+description = Automatically creates pathauto aliases for RDF documents of nodes
+core = 7.x
+dependencies[] = rdfx
+dependencies[] = pathauto
+configure = admin/config/search/path/patterns

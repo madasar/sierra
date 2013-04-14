@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * The Pathauto for RDF module which automatically creates RDF aliases. 
+ *
+ * The Pathauto for RDF module automatically generates RDF path aliases for 
+ * nodes, using the Pathauto API and without requiring the user to manually
+ * specify the path alias. This allows you to get aliases like
+ * /category/my-node-title.rdf instead of /node/123.rdf. The aliases 
+ * are based upon the Pathauto "pattern" system which the administrator 
+ * can control.
+ */
+
+/**
+ * Implements hook_pathauto().
+ */
+function pathauto_for_rdf_pathauto() {
+  $settings = new stdClass();
+  $settings->module = 'pathauto_for_rdf';
+  $settings->groupheader = t('RDF Paths');
+  $settings->patterndescr = t('Default RDF path pattern');
+  $settings->patterndefault = '[node:content-type]/[node:title].rdf';
+  $settings->token_type = 'node';
+  $settings->batch_update_callback = 'pathauto_for_rdf_pathauto_bulkupdate';
+  return $settings;
+}
+
+/**
+ * Helper function to create the alias.
+ */
+function pathauto_for_rdf_create_alias($node, $op) {
+  module_load_include('inc', 'pathauto');
+  $alias = pathauto_create_alias('pathauto_for_rdf', $op, 'node/' . $node->nid . '.rdf', array('node' => $node));
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function pathauto_for_rdf_node_insert($node) {
+  pathauto_for_rdf_create_alias($node, 'insert');
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function pathauto_for_rdf_node_update($node) {
+  pathauto_for_rdf_create_alias($node, 'update');
+}
+
+/**
+ * Implements hook_pathauto_bulkupdate().
+ */
+function pathauto_for_rdf_pathauto_bulkupdate() {
+  // Find all node ids.
+  $query = db_select('node', 'n');
+  $query->fields('n', array('nid'));
+  $results = $query->execute()->fetchCol();
+  $count = 0;
+  foreach ($results as $nid) {
+    $node = node_load($nid);
+    pathauto_for_rdf_create_alias($node, 'bulkupdate');
+    $count++;
+  }
+}
