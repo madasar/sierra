@@ -15,17 +15,17 @@ A single Sierra installation is useful to manage the resources of a single organ
 
 An example network might look like:
 
-![Network](/figs/net.png)
+![Network](figs/net.png)
 
 ## Screenshots
 
-![Front Page](/figs/s-map.png)
+![Front Page](figs/s-map.png)
 
-![Search](/figs/s-search.png)
+![Search](figs/s-search.png)
 
-![Make Request](/figs/s-request.png)
+![Make Request](figs/s-request.png)
 
-![View Response](/figs/s-response.png)
+![View Response](figs/s-response.png)
 
 ## Install Instructions
 
