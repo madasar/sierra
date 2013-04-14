@@ -1,1 +1,20 @@
 header { background-color: #E01B6A; color:white; }
+header h1 { color:white; }
+
+div[role=main] a[href ^="http://"],
+div[role=main] a[href ^="https://"],
+div[role=main] a[href ^="//"] {
+background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAVklEQVR4Xn3PgQkAMQhDUXfqTu7kTtkpd5RA8AInfArtQ2iRXFWT2QedAfttj2FsPIOE1eCOlEuoWWjgzYaB/IkeGOrxXhqB+uA9Bfcm0lAZuh+YIeAD+cAqSz4kCMUAAAAASUVORK5CYII=) center right no-repeat;
+background: url(//bits.wikimedia.org/static-1.22wmf1/skins/vector/images/external-link-ltr-icon.png?2013-04-01T17:18:20Z) center right no-repeat!ie;
+padding-right: 13px;
+}
+
+div[role=main] a:hover { border-bottom: 1px dotted; }
+
+.button-group {
+	margin: 1.25em 0 0;
+}
+
+.button-group a {
+	margin-bottom: 0;
+}

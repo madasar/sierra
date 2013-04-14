@@ -34,7 +34,7 @@ An example network might look like:
 People who have contributed to the project.
 
 - Seyyed
-- Drew
+- [Drew](//dhornbein.com)
 - Lisha
 - Christopher
 - Roser
