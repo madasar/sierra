@@ -1,13 +1,7 @@
 ---
 ---
 
-<!DOCTYPE html>
-<html>
-<head>
-	<link rel="stylesheet" href="/css/site.css">
-	<script src="/js/site.js"></script>
-	<title>My Blog</title>
-</head>
+{% include head.html %}
 <body>
 	<header>
 		{% include header.html %}
@@ -21,8 +15,5 @@
 			</article>
 		{% endfor %}
 	</div>
-	<footer>
-		{% include footer.html %}
-	</footer>
-</body>
-</html>
+{% include footer.html %}
+{% include foot.html %}
